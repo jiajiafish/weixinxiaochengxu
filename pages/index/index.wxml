@@ -1,5 +1,12 @@
 <view class='weather-wrapper'>
-<image class="weather-bg" src="/images/sunny-bg.png" mode="scaleToFill"></image>
-  <view class="tem">12°</view>
-  <view class="desc">晴天</view>
+<image class="weather-bg" src="{{nowWeatherBackground}}" mode="scaleToFill"></image>
+  <view class="tem">{{nowTemp}}</view>
+  <view class="desc">{{nowWeather}}</view>
+</view>
+<view class='timetips'>
+<image class='timetips-icon' src='/images/time-icon.png'></image>
+<view class='timetips-text'>未来24小时天气预测</view>
+</view>
+<view class='forcast-list'>
+<view class='forcast-item' wx:for="{{[1,2,3,4,5]}}">{{item}}</view>
 </view>
