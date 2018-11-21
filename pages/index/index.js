@@ -6,6 +6,16 @@ const weatherMap = {
   'heavyrain': '大雨',
   'snow': '雪'
 }
+const QQMapWX = require('../../libs/qqmap-wx-jssdk.js');
+
+const UNPROMPTED = 0
+const UNAUTHORIZED = 1
+const AUTHORIZED = 2
+const UNPROMPTED_TIPS = "点击获取当前位置"
+const UNAUTHORIZED_TIPS = "点击开启位置权限"
+const AUTHORIZED_TIPS = ""
+
+
 const weatherColorMap = {
   'sunny': '#cbeefd',
   'cloudy': '#deeef6',
@@ -22,7 +32,11 @@ Page({
     nowTemp: "",
     hourlyWeather: [],
     todayTemp: "",
-    todayDate: ""
+    todayDate: "",
+    // locationTipsText:"点击获取当前位置",
+    locationTipsText: UNPROMPTED_TIPS,
+    locationAuthType: UNPROMPTED,
+    city:"广州市"
   },
   onPullDownRefresh() {
     this.getNow(() => {
@@ -30,13 +44,17 @@ Page({
     })
   },
   onLoad() {
+    
     this.getNow()
+    this.qqmapsdk = new QQMapWX({
+      key: '7IEBZ-5KG3U-KLIVN-42RT2-ABGIH-ENFFB'
+    })
   },
   getNow(callback) {
     wx.request({
       url: 'https://test-miniprogram.com/api/weather/now', //仅为示例，并非真实的接口地址
       data: {
-        city: '上海市',
+        city: this.data.city,
       },
       header: {
         'content-type': 'application/json' // 默认值
@@ -97,7 +115,37 @@ Page({
   },
   onTapDayWeather() {
 wx.navigateTo({
-  url: '/pages/list/list',
+  url: '/pages/list/list?city='+ this.data.city,
 })
-  }
+  },
+  onTapLocation(){
+    wx.getLocation({
+      success: res =>{
+        console.log(res.latitude,res.longitude);
+        this.qqmapsdk.reverseGeocoder({
+          location: {
+            latitude: res.latitude,
+            longitude: res.longitude
+          },
+          success: res => {
+            console.log(res)
+            let city = res.result.address_component.city
+            console.log(city)
+            this.setData({
+              city:city,
+              locationTipsText:""
+            })
+            this.getNow()
+          },
+
+          complete: function (res) {
+            wx.showToast({
+            })
+          }
+        })
+        console.log("666")
+      },
+      
+    })
+  },
 })

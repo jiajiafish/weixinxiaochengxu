@@ -2,14 +2,18 @@
 const dayMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 Page({
   data:{
-    weekWeather :[]
+    weekWeather :[],
+    city: '广州市'
   },
-  onLoad(){
+  onLoad(options){
     this.getWeekWeather()
+    console.log(options.city)
+    this.setData({
+      city:options.city
+    })
   },
   onPullDownRefresh(){
-    this.getWeekWeather(
-      ()=>{
+    this.getWeekWeather(()=> {
         wx.stopPullDownRefresh()
       }
     )
@@ -21,13 +25,15 @@ Page({
         city:"上海市",
         time: new Date().getTime()
       },
-      success:res =>{
+      success:res => {
         let result = res.data.result
+        this.setWeekWeather(result)
         console.log(result)
       },
-      complete:()=>{
+      complete:()=> {
         callback && callback()
-      }
+      },
+
     })
   },
   setWeekWeather(result){
@@ -39,12 +45,10 @@ Page({
         day:dayMap[date.getDay()],
         date:`${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`,
         temp: `${result[i].minTemp}°-${result[i].maxTemp}°`,
-        iconPath:'/images/'+ result[i].weekWeather+'-icon.png'
-
+        iconPath: '/images/' + result[i].weather+'-icon.png'
       })
-
     }
-    weekWeather[0] = '今天'
+    weekWeather[0].day = '今天'
     this.setData({
       weekWeather:weekWeather
     })
